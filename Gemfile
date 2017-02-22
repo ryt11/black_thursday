@@ -5,3 +5,6 @@ gem 'reek'
 gem 'rake'
 gem 'minitest'
 gem 'pry'
+gem 'simplecov', :require => false, :group => :test
+
+
