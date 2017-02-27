@@ -33,16 +33,18 @@ class CustomerRepository
 		customers.has_key?(id) ? customers[id] : nil
 	end
 
-	def find_all_by_first_name(first_name)
-		  all.select do |customer|
-			   customer.first_name.downcase == first_name.downcase
+	def find_all_by_first_name(name_fragment)
+		  found_customers = all.select do |customer|
+			   customer.first_name.downcase.include?(name_fragment.downcase) ? customer.first_name : next
 		  end
+			found_customers.compact
 	end
 
-  def find_all_by_last_name(last_name)
-		  all.select do |customer|
-			   customer.last_name.downcase == last_name.downcase
-		  end
+  def find_all_by_last_name(name_fragment)
+		found_customers = all.select do |customer|
+			 customer.last_name.downcase.include?(name_fragment.downcase) ? customer.last_name : next
+		end
+		found_customers.compact
 	end
 
 	def inspect
