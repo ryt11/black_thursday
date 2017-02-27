@@ -28,4 +28,8 @@ class Transaction
   def updated_at
     transaction_info[:updated_at]
   end
+
+  def invoice
+    trans_inv_instance.sales_engine_instance.invoices.find_by_id(invoice_id)
+  end
 end

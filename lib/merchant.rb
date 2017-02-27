@@ -6,7 +6,6 @@ class Merchant
 	end
 
 	def name
-		#call this instead of hash for refactor
 		merchant_info[:name]
 	end
 
@@ -22,7 +21,9 @@ class Merchant
 		mr_instance.sales_engine_instance.invoices.find_all_by_merchant_id(id)
 	end
 
-	# def customers
-
-	# end
+	def customers
+		invoices = mr_instance.sales_engine_instance.invoices.find_all_by_merchant_id(id)
+		customer_ids = invoices.map { |invoice| invoice.customer_id }
+		customer_ids.map { |customer_id| mr_instance.sales_engine_instance.customers.find_by_id(customer_id) }
+	end
 end
