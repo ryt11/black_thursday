@@ -33,7 +33,17 @@ attr_reader :invoice_info, :inv_parent
 		invoice_info[:merchant_id]
 	end
 
-  def merchant
-    inv_parent.sales_engine_instance.merchants.find_by_id(merchant_id)
+	def find_items_by_invoice_id(invoice_id)
+	invoice_items = find_invoice_items_by_invoice_id(invoice_id)
+	item_ids = invoice_items.map {|invoice_item| invoice_item.item_id}
+	item_ids.map {|item_id| items.find_by_id(item_id)}
+end
+
+
+
+  def items
+		invoice_items_found = inv_parent.sales_engine_instance.invoice_items.find_all_by_invoice_id(id)
+		item_ids = invoice_items_found.map { |invoice_item| invoice_item.item_id }
+		item_ids.map {|item_id| inv_parent.sales_engine_instance.items.find_by_id(item_id)}
   end
 end

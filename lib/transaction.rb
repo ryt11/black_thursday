@@ -28,8 +28,13 @@ class Transaction
   def updated_at
     transaction_info[:updated_at]
   end
+  
+  def credit_card_expiration_date
+    transaction_info[:credit_card_expiration_date]
+  end
 
   def invoice
     trans_inv_instance.sales_engine_instance.invoices.find_by_id(invoice_id)
   end
+
 end
