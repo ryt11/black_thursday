@@ -1,7 +1,7 @@
 require_relative 'transaction'
 require 'csv'
 require 'pry'
-require 'time'
+
 
 class TransactionRepository
 	attr_reader :file, :transactions, :sales_engine_instance
@@ -45,7 +45,7 @@ class TransactionRepository
 
   def find_all_by_result(result)
     transactions.all.select do |transaction|
-      transaction.result == result
+      transaction.result == result.downcase
     end
   end
 
