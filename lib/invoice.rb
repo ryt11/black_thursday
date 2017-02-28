@@ -47,6 +47,10 @@ attr_reader :invoice_info, :inv_parent
     inv_parent.sales_engine_instance.customers.find_by_id(customer_id)
   end
 
+  def merchant
+    inv_parent.sales_engine_instance.merchants.find_by_id(merchant_id)
+  end
+
   def is_paid_in_full?
     found = inv_parent.sales_engine_instance.transactions.find_all_by_invoice_id(id)
     found.any? { |transaction| transaction.result == "success" }

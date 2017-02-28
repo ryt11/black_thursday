@@ -6,7 +6,7 @@ class TransactionTest < Minitest::Test
 	attr_reader :transaction
 	def setup
 		@transaction = Transaction.new({:id => "7".to_i, :credit_card_number => "4613250127567219".to_i, :invoice_id => "1298".to_i, 
-			:credit_card_expiration_date => Time.parse("2012-02-26 20:56:57 UTC"), :result => "success", 
+			:credit_card_expiration_date => "2012-02-26 20:56:57 UTC", :result => "success", 
 			:created_at => Time.parse('2012-02-26 20:56:57 UTC'), 
 			:updated_at => Time.parse('2012-02-26 20:56:57 UTC')}, nil)
 	end
@@ -36,7 +36,7 @@ class TransactionTest < Minitest::Test
 	end
 
 	def test_transaction_has_a_credit_card_expiration_date
-		expected = Time.parse("2012-02-26 20:56:57 UTC")
+		expected = "2012-02-26 20:56:57 UTC"
 		assert_equal expected, transaction.credit_card_expiration_date
 	end
 
