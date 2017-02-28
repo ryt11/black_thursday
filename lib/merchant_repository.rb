@@ -18,7 +18,7 @@ class MerchantRepository
     open_contents.each do |row|
       id = row[:id].to_i
       name = row[:name]
-      @merchants[id] = Merchant.new({:id => id, :name => name}, self)
+      @merchants[id] = Merchant.new({:id => id, :name => name, :created_at => Time.parse(row[:created_at])}, self)
     end
   end
 

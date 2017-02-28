@@ -13,9 +13,14 @@ class Merchant
     merchant_info[:id]
   end
 
+  def created_at
+    merchant_info[:created_at]
+  end
+
   def items
     mr_instance.sales_engine_instance.items.find_all_by_merchant_id(id)
   end
+
 
   def invoices
     mr_instance.sales_engine_instance.invoices.find_all_by_merchant_id(id)
