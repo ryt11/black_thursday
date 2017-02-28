@@ -188,7 +188,7 @@ end
      selection = se_inst.invoices
      se_inst.merchants.all.each do |merchant|
        merchants_total_hash[merchant] += selection.find_all_by_merchant_id(merchant.id).reduce(0) do |sum, invoice|
-         invoice.is_paid_in_full? ? sum += invoice.total : sum += 0.0
+         sum += invoice.total
        end
      end
      merchants_total_hash
@@ -196,9 +196,15 @@ end
 
   def top_revenue_earners(x = 20)
      whats_this = merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys[0...x]
+    #se_inst.merchants.sort_by(:total_sales).first(20)
+  end
+
+  def merchants_ranked_by_revenue
+    merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys  
   end
 
   def merchants_with_pending_invoices
+    # paid_invoices = se_inst.invoices.paid_invoices
     invoices = se_inst.invoices.all.select { |invoice| !invoice.is_paid_in_full? == true }
       invoices.map do |invoice|
         se_inst.merchants.find_by_id(invoice.merchant_id)

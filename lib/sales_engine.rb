@@ -9,7 +9,7 @@ class SalesEngine
     attr_accessor :paths, :items, :merchants, :invoices, :invoice_items, :transactions, :customers
   def initialize (hash)
     @paths = hash
-    @items = ItemRepository.new(@paths[:items], self) unless @paths[:items] == nil
+    @items = ItemRepository.new(@paths[:items], self) unless @paths[:items].nil?
     @merchants = MerchantRepository.new(@paths[:merchants], self) unless @paths[:merchants] == nil
     @invoices = InvoiceRepository.new(@paths[:invoices], self) unless @paths[:invoices] == nil
     @invoice_items = InvoiceItemRepository.new(@paths[:invoice_items], self) unless @paths[:invoice_items] == nil

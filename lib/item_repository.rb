@@ -71,7 +71,7 @@ class ItemRepository
   end
 
   def inspect
-    "#<#{self.class} #{@merchants.size} rows>"
+    "#<#{self.class} #{@items.size} rows>"
     #possibly need to change @merchants to @items, check harness
   end
 end
