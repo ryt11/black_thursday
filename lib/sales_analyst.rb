@@ -158,12 +158,44 @@ end
       frequency >= (std_dev + avg)
     end.keys
   end
-
-  # def find_merchant_greater_count
-  #   std_dev = average_invoices_per_merchant_standard_deviation
-  #   avg = average_invoices_per_merchant
-  #   se_inst.merchants.all.detect do |merchant|
-  #     merchant.invoices.count <= 1
+ # merchants invoices for the day specified > then all invoice_items > then sum all invoice items, not including failed transactions, so only the successful ones.
+  # def total_revenue_by_date(date)
+  #   found_invoices = se_inst.invoices.all.select do |invoice|
+  #       invoice.created_at.strftime("%Y-%m-%d") == date.strftime("%Y-%m-%d")
+  #     end
+  #     all_trans = se_inst.transactions
+  #     found_invoices.map do |invoice|
+  #       if all_trans.find_all_by_invoice_id(invoice.id).each { |transaction| transaction.result == "success" ? next : found_invoices.delete(invoice)  }
+  #       # all_trans.find_all_by_invoice_id(invoice.id).select do |transaction|
+  #       #   transaction.result == "success"
+  #       end
+  #     end
   #   end
-  # end
+
+  def find_invoices_by_date(date)
+      se_inst.invoices.all.select do |invoice|
+        invoice.created_at.strftime("%Y-%m-%d") == date.strftime("%Y-%m-%d")
+      end
+  end
+
+  def total_revenue_by_date(date)
+    found_invoices = find_invoices_by_date(date)
+    found_invoices.reduce(0) { |sum, invoice| sum += invoice.total }
+  end
+
+  def merchant_invoice_totals
+    merchants_total_hash = Hash.new(0)
+     selection = se_inst.invoices
+     se_inst.merchants.all.map do |merchant|
+       merchants_total_hash[merchant] += selection.find_all_by_merchant_id(merchant.id).reduce(0) do |sum, invoice|
+         invoice.is_paid_in_full? ? sum += invoice.total : sum += 0.0
+       end
+     end
+     merchants_total_hash
+  end
+
+  def top_revenue_earners(x = 20)
+     whats_this = merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys[0...x]
+  end
+
 end

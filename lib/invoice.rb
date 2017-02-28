@@ -49,10 +49,12 @@ attr_reader :invoice_info, :inv_parent
 
   def is_paid_in_full?
     found = inv_parent.sales_engine_instance.transactions.find_all_by_invoice_id(id)
-    found.all? { |transaction| transaction.result == "success" } && !found.empty?
+    found.any? { |transaction| transaction.result == "success" }
   end
 
   def total
+    return 0.0 unless is_paid_in_full?
+    # items.map{|item| item.total}.reduce(:+)
     invoice_items_found = inv_parent.sales_engine_instance.invoice_items.find_all_by_invoice_id(id)
     invoice_items_found.map  { |invoice_item| invoice_item.quantity * invoice_item.unit_price }.reduce(:+)
   end
