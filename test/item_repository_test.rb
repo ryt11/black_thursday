@@ -2,7 +2,6 @@ require_relative 'test_helper'
 require './lib/sales_engine'
 require './lib/item_repository'
 
-
 class ItemRepositoryTest < Minitest::Test 
 	attr_reader :se, :ir
 	def setup
@@ -50,7 +49,6 @@ class ItemRepositoryTest < Minitest::Test
 		ir_1 = se.items
 
 		result = ir_1.find_all_by_price('1200')
-		# assert_equal ['1200'], result
 		assert_equal Array, result.class
 		assert_equal Item, result[0].class
 		assert_equal false, result.any? { |item| item.unit_price != '1200' }

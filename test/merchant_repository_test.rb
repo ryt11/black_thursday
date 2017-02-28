@@ -13,7 +13,6 @@ class MerchantRepositoryTest < Minitest::Test
 	end
 
 	def test_that_merchant_maker_returns_a_populated_hash
-		# mr.merchant_maker
 		refute mr.merchants.empty?
 		assert_equal Hash, mr.merchants.class
 	end
@@ -25,7 +24,6 @@ class MerchantRepositoryTest < Minitest::Test
 
 	def test_find_by_id
 		assert_equal Merchant, mr.find_by_id(12334105).class
-		# Merchant:0x007fad81930a68
 		assert_nil mr.find_by_id('hedgehog')
 	end
 
