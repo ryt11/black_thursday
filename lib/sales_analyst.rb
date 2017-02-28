@@ -186,7 +186,7 @@ end
   def merchant_invoice_totals
     merchants_total_hash = Hash.new(0)
      selection = se_inst.invoices
-     se_inst.merchants.all.map do |merchant|
+     se_inst.merchants.all.each do |merchant|
        merchants_total_hash[merchant] += selection.find_all_by_merchant_id(merchant.id).reduce(0) do |sum, invoice|
          invoice.is_paid_in_full? ? sum += invoice.total : sum += 0.0
        end
@@ -196,6 +196,64 @@ end
 
   def top_revenue_earners(x = 20)
      whats_this = merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys[0...x]
+  end
+
+  def merchants_with_pending_invoices
+    invoices = se_inst.invoices.all.select { |invoice| !invoice.is_paid_in_full? == true }
+      invoices.map do |invoice|
+        se_inst.merchants.find_by_id(invoice.merchant_id)
+      end.uniq
+  end
+
+  def merchants_with_only_one_item
+    se_inst.merchants.all.select {|merchant| merchant.items.count == 1}
+  end
+
+  def merchants_with_only_one_item_registered_in_month(month)
+    month_merchants = se_inst.merchants.all.select do |merchant|
+      merchant.created_at.strftime("%B").downcase == month.downcase
+    end
+    month_merchants.select do |merchant|
+      merchant.items.count == 1
+    end
+
+  end
+
+  def revenue_by_merchant(merchant_id)
+    found_invoices = se_inst.merchants.find_by_id(merchant_id).invoices
+    found_invoices.map do |invoice|
+      invoice.total
+    end.reduce(:+)
+  end
+
+  def most_sold_item_for_merchant(merchant_id)
+    sold_count = Hash.new(0)
+    invoices = se_inst.merchants.find_by_id(merchant_id).invoices
+    invoice_items = invoices.map do |invoice|#makeitsownmethod
+      invoice.is_paid_in_full? ? se_inst.invoice_items.find_all_by_invoice_id(invoice.id) : next
+    end.flatten(1).compact
+    invoice_items.each do |item|#makeitsownmethod
+      sold_count[item.item_id] += item.quantity
+    end
+    high_item_ids = sold_count.select {|k, v| k if v == sold_count.values.max }
+    final = high_item_ids.keys.map do |item_id|
+      se_inst.items.find_by_id(item_id)
+    end
+  end
+
+  def best_item_for_merchant(merchant_id) #refactor
+    revenue_count = Hash.new(0)
+    invoices = se_inst.merchants.find_by_id(merchant_id).invoices
+    invoice_items = invoices.map do |invoice|
+      invoice.is_paid_in_full? ? se_inst.invoice_items.find_all_by_invoice_id(invoice.id) : next
+    end.flatten(1).compact
+
+    invoice_items.each do |item|
+      revenue_count[item.item_id] += (item.quantity * item.unit_price)
+    end
+    high_revenue_items = revenue_count.select {|k, v| k if v == revenue_count.values.max}
+    se_inst.items.find_by_id(high_revenue_items.keys[0])
+
   end
 
 end
