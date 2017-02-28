@@ -48,10 +48,4 @@ class ItemTest < Minitest::Test
 	def test_invoice_has_a_merchant_id
 		assert_equal 12335955, invoice.merchant_id
 	end
-
-	def test_invoice_merchant_connection
-		#requires all se, item, instances
-		skip
-		assert_equal Merchant, invoice.merchant.class
-	end
 end

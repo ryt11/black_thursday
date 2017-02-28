@@ -55,10 +55,4 @@ class ItemTest < Minitest::Test
 	def test_item_has_a_merchant_id
 		assert_equal 12334141, item.merchant_id
 	end
-
-	def test_item_merchant_connection
-		#requires all se, item, instances
-		skip
-		assert_equal Merchant, item.merchant.class
-	end
 end
