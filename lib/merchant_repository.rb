@@ -17,7 +17,6 @@ class MerchantRepository
   def merchant_maker
     open_contents.each do |row|
       id = row[:id].to_i
-      #potential to_sym or to_i (value)
       name = row[:name]
       @merchants[id] = Merchant.new({:id => id, :name => name}, self)
     end
