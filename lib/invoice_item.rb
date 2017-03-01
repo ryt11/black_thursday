@@ -42,6 +42,6 @@ class InvoiceItem
   end
 
   def item
-    inv_item_repo_instance.sales_engine_instance.items.find_by_id(id)
+    inv_item_repo_instance.se_inst.items.find_by_id(id)
   end
 end

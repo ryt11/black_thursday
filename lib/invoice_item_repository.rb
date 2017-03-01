@@ -3,10 +3,10 @@ require 'csv'
 require 'pry'
 require 'bigdecimal'
 class InvoiceItemRepository
-  attr_reader :file, :invoice_items, :sales_engine_instance
-  def initialize(file, sales_engine_instance)
+  attr_reader :file, :invoice_items, :se_inst
+  def initialize(file, se_inst)
     @file = file
-    @sales_engine_instance = sales_engine_instance
+    @se_inst = se_inst
     @invoice_items = Hash.new(0)
     invoice_item_maker
   end
@@ -18,8 +18,12 @@ class InvoiceItemRepository
   def invoice_item_maker
     open_contents.each do |row|
       id = row[:id].to_i
-      #add bigdecimal/Time for price/created_at/updated_at
-      invoice_items[id] = InvoiceItem.new({:id => id, :item_id => row[:item_id].to_i, :invoice_id => row[:invoice_id].to_i, :quantity => row[:quantity].to_i, :unit_price => BigDecimal.new(row[:unit_price].to_i)/100, :created_at => Time.parse(row[:created_at]), :updated_at => Time.parse(row[:updated_at])}, self)
+      invoice_items[id] = InvoiceItem.new({:id => id,
+        :item_id => row[:item_id].to_i, :invoice_id => row[:invoice_id].to_i,
+        :quantity => row[:quantity].to_i,
+        :unit_price => BigDecimal.new(row[:unit_price].to_i)/100,
+        :created_at => Time.parse(row[:created_at]),
+        :updated_at => Time.parse(row[:updated_at])}, self)
     end
   end
 
