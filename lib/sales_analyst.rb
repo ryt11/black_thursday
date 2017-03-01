@@ -158,19 +158,6 @@ end
       frequency >= (std_dev + avg)
     end.keys
   end
- # merchants invoices for the day specified > then all invoice_items > then sum all invoice items, not including failed transactions, so only the successful ones.
-  # def total_revenue_by_date(date)
-  #   found_invoices = se_inst.invoices.all.select do |invoice|
-  #       invoice.created_at.strftime("%Y-%m-%d") == date.strftime("%Y-%m-%d")
-  #     end
-  #     all_trans = se_inst.transactions
-  #     found_invoices.map do |invoice|
-  #       if all_trans.find_all_by_invoice_id(invoice.id).each { |transaction| transaction.result == "success" ? next : found_invoices.delete(invoice)  }
-  #       # all_trans.find_all_by_invoice_id(invoice.id).select do |transaction|
-  #       #   transaction.result == "success"
-  #       end
-  #     end
-  #   end
 
   def find_invoices_by_date(date)
       se_inst.invoices.all.select do |invoice|
