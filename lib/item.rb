@@ -37,6 +37,6 @@ attr_reader :item_info, :ir_instance
   end
 
   def merchant
-    ir_instance.sales_engine_instance.merchants.find_by_id(merchant_id)
+    ir_instance.se_inst.merchants.find_by_id(merchant_id)
   end
 end

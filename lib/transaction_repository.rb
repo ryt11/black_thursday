@@ -4,10 +4,10 @@ require 'pry'
 
 
 class TransactionRepository
-  attr_reader :file, :transactions, :sales_engine_instance
-  def initialize(file, sales_engine_instance)
+  attr_reader :file, :transactions, :se_inst
+  def initialize(file, se_inst)
     @file = file
-    @sales_engine_instance = sales_engine_instance
+    @se_inst = se_inst
     @transactions = Hash.new(0)
     transaction_maker
   end
@@ -19,7 +19,11 @@ class TransactionRepository
   def transaction_maker
     open_contents.each do |row|
       id = row[:id].to_i
-      transactions[id] = Transaction.new({:id => id, :credit_card_number => row[:credit_card_number].to_i, :invoice_id => row[:invoice_id].to_i, :credit_card_expiration_date => row[:credit_card_expiration_date], :result => row[:result], :created_at => Time.parse(row[:created_at]), :updated_at => Time.parse(row[:updated_at])}, self)
+      transactions[id] = Transaction.new({:id => id, :credit_card_number =>
+        row[:credit_card_number].to_i, :invoice_id => row[:invoice_id].to_i,
+        :credit_card_expiration_date => row[:credit_card_expiration_date],
+        :result => row[:result], :created_at => Time.parse(row[:created_at]),
+        :updated_at => Time.parse(row[:updated_at])}, self)
     end
   end
 

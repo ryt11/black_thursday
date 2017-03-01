@@ -5,10 +5,10 @@ require 'bigdecimal'
 require 'time'
 
 class InvoiceRepository
-  attr_reader :file, :invoices, :sales_engine_instance
-  def initialize(file, sales_engine_instance)
+  attr_reader :file, :invoices, :se_inst
+  def initialize(file, se_inst)
     @file = file
-    @sales_engine_instance = sales_engine_instance
+    @se_inst = se_inst
     @invoices = Hash.new(0)
     invoice_maker
   end
@@ -20,8 +20,12 @@ class InvoiceRepository
   def invoice_maker
     open_contents.each do |row|
     id = row[:id].to_i
-    invoices[id] = Invoice.new({:id => id, :customer_id => row[:customer_id].to_i, :status => row[:status].to_sym,
-    :created_at => Time.parse(row[:created_at].to_s), :updated_at => Time.parse(row[:updated_at]), :merchant_id => row[:merchant_id].to_i}, self)
+    invoices[id] = Invoice.new({:id => id,
+      :customer_id => row[:customer_id].to_i,
+      :status => row[:status].to_sym,
+      :created_at => Time.parse(row[:created_at].to_s),
+      :updated_at => Time.parse(row[:updated_at]),
+      :merchant_id => row[:merchant_id].to_i}, self)
     end
   end
 

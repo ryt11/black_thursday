@@ -1,3 +1,4 @@
+  require 'pry'
   class SalesAnalyst
   attr_reader :se_inst
 
@@ -6,7 +7,7 @@
   end
 
   def average_items_per_merchant
-	(se_inst.items.all.count.to_f / se_inst.merchants.all.count.to_f).round(2)
+    (se_inst.items.all.count.to_f / se_inst.merchants.all.count.to_f).round(2)
   end
 
   def diff_btw_mean_and_item_c_sqrd_summed
@@ -33,17 +34,23 @@
 
   def average_item_price_for_merchant(merchant_id)
     item_list = se_inst.merchants.find_by_id(merchant_id).items
-    (item_list.reduce(0.0) { |price_total, item| price_total + item.unit_price } / item_list.size).round(2)
+    (item_list.reduce(0.0) do |price_total, item|
+      price_total + item.unit_price
+    end / item_list.size).round(2)
   end
 
   def average_average_price_per_merchant
-    merch_avgs = se_inst.merchants.all.map { |merchant| average_item_price_for_merchant(merchant.id) }
+    merch_avgs = se_inst.merchants.all.map do |merchant|
+      average_item_price_for_merchant(merchant.id)
+    end
     (merch_avgs.reduce(:+)/merch_avgs.count).round(2)
   end
 
   def average_item_price
     all_items = se_inst.items.all
-    (all_items.reduce(0.0) { |total, item| total + item.unit_price} / all_items.count.to_f).round(2)
+    all_items.reduce(0.0) do |total, item|
+      ((total + item.unit_price) / all_items.count.to_f).round(2)
+    end
   end
 
   def get_item_price_set
@@ -52,12 +59,15 @@
 
   def difference_between_mean_and_item_price_squared_summed
     mean = average_item_price
-    get_item_price_set.map { |item_price| (item_price - mean) ** 2 }.reduce(:+).round(2)
+    get_item_price_set.map do |item_price|
+      (item_price - mean) ** 2
+    end.reduce(:+).round(2)
   end
 
   def average_item_price_standard_deviation
     set_length = (get_item_price_set.length - 1)
-    Math.sqrt(difference_between_mean_and_item_price_squared_summed/set_length).round(2)
+    diff = difference_between_mean_and_item_price_squared_summed
+    Math.sqrt(diff/set_length).round(2)
   end
 
   def golden_items
@@ -67,7 +77,8 @@
   end
 
   def average_invoices_per_merchant
-    (se_inst.invoices.all.count.to_f / se_inst.merchants.all.count.to_f).round(2)
+    avg_inv = se_inst.invoices.all.count.to_f
+    (avg_inv / se_inst.merchants.all.count.to_f).round(2)
   end
 
   def get_merchant_invoices_set
@@ -78,12 +89,15 @@
 
   def difference_between_mean_and_invoice_count_squared_summed
     mean = average_invoices_per_merchant
-    get_merchant_invoices_set.map { |invoices| (invoices - mean) ** 2 }.reduce(:+).round(2)
+    get_merchant_invoices_set.map do |invoices|
+      (invoices - mean) ** 2
+    end.reduce(:+).round(2)
   end
 
   def average_invoices_per_merchant_standard_deviation
     set_length = (get_merchant_invoices_set.count - 1)
-    Math.sqrt(difference_between_mean_and_invoice_count_squared_summed/set_length).round(2)
+    sum = difference_between_mean_and_invoice_count_squared_summed
+    Math.sqrt(sum/set_length).round(2)
   end
 
   def top_merchants_by_invoice_count
@@ -116,15 +130,15 @@
   end
 
   def days_of_the_week
-  {"Sunday" => 0,
+    {"Sunday" => 0,
    "Monday" => 1,
    "Tuesday" => 2,
    "Wednesday" => 3,
    "Thursday" => 4,
    "Friday" => 5,
    "Saturday" => 6
- }.invert
-end
+    }.invert
+  end
 
   def frequency_created_per_day
     day_count = Hash.new(0)
@@ -174,7 +188,8 @@ end
     merchants_total_hash = Hash.new(0)
      selection = se_inst.invoices
      se_inst.merchants.all.each do |merchant|
-       merchants_total_hash[merchant] += selection.find_all_by_merchant_id(merchant.id).reduce(0) do |sum, invoice|
+      invoices = selection.find_all_by_merchant_id(merchant.id)
+       merchants_total_hash[merchant] += invoices.reduce(0) do |sum, invoice|
          sum += invoice.total
        end
      end
@@ -182,8 +197,9 @@ end
   end
 
   def top_revenue_earners(x = 20)
-     whats_this = merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys[0...x]
-    #se_inst.merchants.sort_by(:total_sales).first(20)
+     whats_this = merchant_invoice_totals.sort_by do |k, v|
+      v
+    end.reverse.to_h.keys[0...x]
   end
 
   def merchants_ranked_by_revenue
@@ -191,8 +207,9 @@ end
   end
 
   def merchants_with_pending_invoices
-    # paid_invoices = se_inst.invoices.paid_invoices
-    invoices = se_inst.invoices.all.select { |invoice| !invoice.is_paid_in_full? == true }
+    invoices = se_inst.invoices.all.select do |invoice|
+      !invoice.is_paid_in_full? == true
+    end
       invoices.map do |invoice|
         se_inst.merchants.find_by_id(invoice.merchant_id)
       end.uniq
@@ -209,7 +226,6 @@ end
     month_merchants.select do |merchant|
       merchant.items.count == 1
     end
-
   end
 
   def revenue_by_merchant(merchant_id)
@@ -222,30 +238,58 @@ end
   def most_sold_item_for_merchant(merchant_id)
     sold_count = Hash.new(0)
     invoices = se_inst.merchants.find_by_id(merchant_id).invoices
-    invoice_items = invoices.map do |invoice|#makeitsownmethod
-      invoice.is_paid_in_full? ? se_inst.invoice_items.find_all_by_invoice_id(invoice.id) : next
-    end.flatten(1).compact
-    invoice_items.each do |item|#makeitsownmethod
+    find_invoice_items(invoices)
+    add_quantity_of_invoice_item(find_invoice_items(invoices), sold_count)
+  end
+
+    def find_invoice_items(invoices)
+    invoice_items = invoices.map do |invoice|
+      if invoice.is_paid_in_full?
+        se_inst.invoice_items.find_all_by_invoice_id(invoice.id)
+        else
+          next
+        end
+      end.flatten(1).compact
+    end
+
+  def add_quantity_of_invoice_item(invoice_items, sold_count)
+    invoice_items.each do |item|
       sold_count[item.item_id] += item.quantity
     end
-    high_item_ids = sold_count.select {|k, v| k if v == sold_count.values.max }
-    final = high_item_ids.keys.map do |item_id|
+    high_item_ids = find_high_item_ids(sold_count)
+    find_highest_items_by_id(high_item_ids)
+  end
+
+  def find_high_item_ids(sold_count)
+    sold_count.select do |k, v|
+      k if v == sold_count.values.max
+    end
+  end
+
+  def find_highest_items_by_id(ids)
+      ids.keys.map do |item_id|
       se_inst.items.find_by_id(item_id)
     end
   end
 
-  def best_item_for_merchant(merchant_id) #refactor
+  def best_item_for_merchant(merchant_id)
     revenue_count = Hash.new(0)
     invoices = se_inst.merchants.find_by_id(merchant_id).invoices
     invoice_items = invoices.map do |invoice|
-      invoice.is_paid_in_full? ? se_inst.invoice_items.find_all_by_invoice_id(invoice.id) : next
-    end.flatten(1).compact
-
+      if invoice.is_paid_in_full?
+        se_inst.invoice_items.find_all_by_invoice_id(invoice.id)
+        else
+          next
+        end
+      end.flatten(1).compact
+      #make new method
     invoice_items.each do |item|
       revenue_count[item.item_id] += (item.quantity * item.unit_price)
     end
-    high_revenue_items = revenue_count.select {|k, v| k if v == revenue_count.values.max}
+    #method
+    high_revenue_items = revenue_count.select do |k, v|
+      k if v == revenue_count.values.max
+    end
     se_inst.items.find_by_id(high_revenue_items.keys[0])
   end
-
 end

@@ -1,7 +1,6 @@
 require 'bigdecimal'
 require 'pry'
 
-
 class Customer
     attr_reader :customer_info, :cust_repo_instance
   def initialize(customer_info, cust_repo_instance)
@@ -31,8 +30,12 @@ class Customer
   end
 
   def merchants
-    invoices = cust_repo_instance.sales_engine_instance.invoices.find_all_by_customer_id(id)
-    merchant_ids = invoices.map { |invoice| invoice.merchant_id }
-    merchant_ids.map { |merchant_id| cust_repo_instance.sales_engine_instance.merchants.find_by_id(merchant_id) }
+    invoices = cust_repo_instance.se_inst.invoices.find_all_by_customer_id(id)
+    merchant_ids = invoices.map do |invoice|
+      invoice.merchant_id
+    end
+    merchant_ids.map do |merchant_id|
+      cust_repo_instance.se_inst.merchants.find_by_id(merchant_id)
+    end
   end
 end

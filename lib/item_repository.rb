@@ -5,10 +5,10 @@ require 'bigdecimal'
 require 'time'
 
 class ItemRepository
-  attr_reader :file, :items, :sales_engine_instance
-  def initialize(file, sales_engine_instance)
+  attr_reader :file, :items, :se_inst
+  def initialize(file, se_inst)
     @file = file
-    @sales_engine_instance = sales_engine_instance
+    @se_inst = se_inst
     @items = Hash.new(0)
     item_maker
   end
@@ -19,11 +19,13 @@ class ItemRepository
 
   def item_maker
     open_contents.each do |row|
-    @items[row[:id].to_i] = Item.new({:id => row[:id].to_i, :name => row[:name], :unit_price => BigDecimal.new(row[:unit_price].to_i)/100,
-    :created_at => Time.parse(row[:created_at]), :updated_at => Time.parse(row[:updated_at]), :merchant_id => row[:merchant_id].to_i,
-    :description => row[:description]}, self)
+    @items[row[:id].to_i] = Item.new({:id => row[:id].to_i, :name => row[:name],
+      :unit_price => BigDecimal.new(row[:unit_price].to_i)/100,
+      :created_at => Time.parse(row[:created_at]),
+      :updated_at => Time.parse(row[:updated_at]),
+      :merchant_id => row[:merchant_id].to_i,
+      :description => row[:description]}, self)
     end
-
   end
 
   def all
@@ -72,6 +74,5 @@ class ItemRepository
 
   def inspect
     "#<#{self.class} #{@items.size} rows>"
-    #possibly need to change @merchants to @items, check harness
   end
 end

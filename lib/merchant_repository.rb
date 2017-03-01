@@ -2,10 +2,10 @@ require_relative 'merchant'
 require 'csv'
 require 'pry'
 class MerchantRepository
-  attr_reader :file, :merchants, :sales_engine_instance
-  def initialize(file, sales_engine_instance)
+  attr_reader :file, :merchants, :se_inst
+  def initialize(file, se_inst)
     @file = file
-    @sales_engine_instance = sales_engine_instance
+    @se_inst = se_inst
     @merchants = Hash.new(0)
     merchant_maker
   end
@@ -18,7 +18,8 @@ class MerchantRepository
     open_contents.each do |row|
       id = row[:id].to_i
       name = row[:name]
-      @merchants[id] = Merchant.new({:id => id, :name => name, :created_at => Time.parse(row[:created_at])}, self)
+      @merchants[id] = Merchant.new({:id => id, :name => name,
+        :created_at => Time.parse(row[:created_at])}, self)
     end
   end
 

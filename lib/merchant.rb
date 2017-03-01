@@ -18,17 +18,19 @@ class Merchant
   end
 
   def items
-    mr_instance.sales_engine_instance.items.find_all_by_merchant_id(id)
+    mr_instance.se_inst.items.find_all_by_merchant_id(id)
   end
 
 
   def invoices
-    mr_instance.sales_engine_instance.invoices.find_all_by_merchant_id(id)
+    mr_instance.se_inst.invoices.find_all_by_merchant_id(id)
   end
 
   def customers
-    invoices = mr_instance.sales_engine_instance.invoices.find_all_by_merchant_id(id)
+    invoices = mr_instance.se_inst.invoices.find_all_by_merchant_id(id)
     customer_ids = invoices.map { |invoice| invoice.customer_id }
-    final = customer_ids.uniq.map { |customer_id| mr_instance.sales_engine_instance.customers.find_by_id(customer_id) }
+    final = customer_ids.uniq.map do |customer_id|
+      mr_instance.se_inst.customers.find_by_id(customer_id)
+    end
   end
 end
