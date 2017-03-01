@@ -8,7 +8,11 @@ class SalesAnalystTest < Minitest::Test
 	def setup
 		@se = SalesEngine.from_csv({
   	:items     => "./test/fixtures/item_fixtures.csv",
-  	:merchants => "./test/fixtures/merchant_fixtures.csv",
+    :merchants => "./test/fixtures/merchant_fixtures.csv",
+    # :merchants => "./data/merchants.csv",
+    :invoice_items => "./data/invoice_items.csv",
+  	:transactions => "./data/transactions.csv",
+  	:customers => "./data/customers.csv",
   	:invoices => "./test/fixtures/invoices_fixture.csv"
 		})
 		@sa = SalesAnalyst.new(se)
@@ -24,15 +28,15 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_that_calculates_avg_items_per_merchant
-		assert_equal 1.69, sa.average_items_per_merchant
+		assert_equal 1.29, sa.average_items_per_merchant
 	end
 
 	def test_it_calculates_diff_btw_mean_and_count_sqrd_summed
-		assert_equal 26.6693, sa.diff_btw_mean_and_item_c_sqrd_summed
+		assert_equal 29.85, sa.diff_btw_mean_and_item_c_sqrd_summed
 	end
 
 	def test_avg_items_per_merchant_std_deviation
-		assert_equal 1.49, sa.average_items_per_merchant_standard_deviation
+		assert_equal 1.37, sa.average_items_per_merchant_standard_deviation
 	end
 
 	def test_high_item_count_in_merchant
@@ -45,7 +49,7 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_get_whole_merchant_items_set
-		assert_equal 13, sa.get_merchant_items_set.count
+		assert_equal 17, sa.get_merchant_items_set.count
 		assert_equal Array, sa.get_merchant_items_set.class
 	end
 
@@ -89,7 +93,7 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_average_invoices_per_merchant
-		assert_equal 5.15, sa.average_invoices_per_merchant
+		assert_equal 3.94, sa.average_invoices_per_merchant
 	end
 
 	def test_it_can_get_whole_invoice_set
@@ -106,11 +110,11 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_difference_between_the_mean_and_invoice_count_sqrd_summed
-		assert_equal 335.49, sa.difference_between_mean_and_invoice_count_squared_summed
+		assert_equal 250.14, sa.difference_between_mean_and_invoice_count_squared_summed
 	end
 
 	def test_average_invoices_per_merchant_std_deviation
-		assert_equal 5.29, sa.average_invoices_per_merchant_standard_deviation
+		assert_equal 3.95, sa.average_invoices_per_merchant_standard_deviation
 	end
 
 	def test_the_top_merchants_by_invoice_count_returned
@@ -162,4 +166,8 @@ class SalesAnalystTest < Minitest::Test
 	 assert_equal Array, sa.top_days_by_invoice_count.class
 	 assert_equal String, sa.top_days_by_invoice_count.first.class
  end
+
+ def test_it_knows_total_revenue_by_date
+   assert_equal 0, sa.total_revenue_by_date(Time.parse("2004-02-14"))
+ end  
 end

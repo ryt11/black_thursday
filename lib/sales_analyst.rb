@@ -11,7 +11,7 @@
 
   def diff_btw_mean_and_item_c_sqrd_summed
     mean = average_items_per_merchant
-    get_merchant_items_set.map { |item_c| (item_c - mean) ** 2 }.reduce(:+)
+    get_merchant_items_set.map { |item_c| (item_c - mean) ** 2 }.reduce(:+).round(2)
   end
 
   def get_merchant_items_set
@@ -200,7 +200,7 @@ end
   end
 
   def merchants_ranked_by_revenue
-    merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys  
+    merchant_invoice_totals.sort_by {|k, v| v}.reverse.to_h.keys
   end
 
   def merchants_with_pending_invoices
@@ -259,7 +259,6 @@ end
     end
     high_revenue_items = revenue_count.select {|k, v| k if v == revenue_count.values.max}
     se_inst.items.find_by_id(high_revenue_items.keys[0])
-
   end
 
 end
