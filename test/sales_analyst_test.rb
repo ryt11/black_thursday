@@ -8,7 +8,12 @@ class SalesAnalystTest < Minitest::Test
 	def setup
 		@se = SalesEngine.from_csv({
   	:items     => "./test/fixtures/item_fixtures.csv",
-  	:merchants => "./test/fixtures/merchant_fixtures.csv",
+    :merchants => "./test/fixtures/merchant_fixtures.csv",
+    # :merchants => "./data/merchants.csv",
+    # :invoice_items => "./data/invoice_items.csv",
+    :invoice_items => "./test/fixtures/invoice_item_fixture_sa.csv",
+  	:transactions => "./test/fixtures/transaction_fixture.csv",
+    # :transactions => "./data/transactions.csv",
   	:invoices => "./test/fixtures/invoices_fixture.csv"
 		})
 		@sa = SalesAnalyst.new(se)
@@ -24,15 +29,15 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_that_calculates_avg_items_per_merchant
-		assert_equal 1.69, sa.average_items_per_merchant
+		assert_equal 1.29, sa.average_items_per_merchant
 	end
 
 	def test_it_calculates_diff_btw_mean_and_count_sqrd_summed
-		assert_equal 26.6693, sa.diff_btw_mean_and_item_c_sqrd_summed
+		assert_equal 29.85, sa.diff_btw_mean_and_item_c_sqrd_summed
 	end
 
 	def test_avg_items_per_merchant_std_deviation
-		assert_equal 1.49, sa.average_items_per_merchant_standard_deviation
+		assert_equal 1.37, sa.average_items_per_merchant_standard_deviation
 	end
 
 	def test_high_item_count_in_merchant
@@ -45,7 +50,7 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_get_whole_merchant_items_set
-		assert_equal 13, sa.get_merchant_items_set.count
+		assert_equal 17, sa.get_merchant_items_set.count
 		assert_equal Array, sa.get_merchant_items_set.class
 	end
 
@@ -54,7 +59,7 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_aggregate_avg_for_avg_price_per_merchant
-		skip
+
 		se_1 = SalesEngine.from_csv({
     :items     => "./data/items.csv",
     :merchants => "./data/merchants.csv",
@@ -65,23 +70,28 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_average_item_price_across_merchants
+
 		assert_equal BigDecimal, sa.average_item_price.class
 	end
 
 	def test_item_price_set
+
 		assert_equal Array, sa.get_item_price_set.class
 		assert_equal 22, sa.get_item_price_set.count
 	end
 
 	def test_diff_mean_and_item_price_sqrd_summed
+
 		assert_equal BigDecimal, sa.difference_between_mean_and_item_price_squared_summed.class
 	end
 
 	def test_standard_deviation_avg_items
+
 		assert_equal 188.05, sa.average_item_price_standard_deviation
 	end
 
 	def test_golden_items
+
 		name_1 = "New Orleans Mardi Gras 2016 4&#39; by 2&#39; acrylic paintings by local artist"
 		assert_equal name_1, sa.golden_items.first.name
 		assert_equal 263556752, sa.golden_items.first.id
@@ -89,10 +99,12 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_average_invoices_per_merchant
-		assert_equal 5.15, sa.average_invoices_per_merchant
+
+		assert_equal 4.0, sa.average_invoices_per_merchant
 	end
 
 	def test_it_can_get_whole_invoice_set
+
 		skip #this passes, slows down
 		se_one = SalesEngine.from_csv({
     :items     => "./data/items.csv",
@@ -106,14 +118,15 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_difference_between_the_mean_and_invoice_count_sqrd_summed
-		assert_equal 335.49, sa.difference_between_mean_and_invoice_count_squared_summed
+		assert_equal 251, sa.difference_between_mean_and_invoice_count_squared_summed
 	end
 
 	def test_average_invoices_per_merchant_std_deviation
-		assert_equal 5.29, sa.average_invoices_per_merchant_standard_deviation
+		assert_equal 3.96, sa.average_invoices_per_merchant_standard_deviation
 	end
 
 	def test_the_top_merchants_by_invoice_count_returned
+
 		assert_equal 1, sa_two.top_merchants_by_invoice_count.count
 		assert_equal 'jejum', sa_two.top_merchants_by_invoice_count.first.name
 		assert_equal 17, sa_two.top_merchants_by_invoice_count.first.invoices.count
@@ -128,38 +141,90 @@ class SalesAnalystTest < Minitest::Test
 	 returned = sa.invoice_status(:returned)
 	 shipped = sa.invoice_status(:shipped)
 	 sum = shipped + pending + returned
-	 assert_equal 29.85, pending
+	 assert_equal 29.41, pending
 	 assert_equal Float, pending.class
-	 assert_equal 11.94, returned
-	 assert_equal 58.21, shipped
+	 assert_equal 13.24, returned
+	 assert_equal 57.35, shipped
 	 assert_equal 0.0, sa.invoice_status(:hamster)
 	 assert_equal 100.00, sum
  end
 
  def test_it_gets_wday
 	 assert_equal Array, sa.get_wdays.class
-	 assert_equal 67, sa.get_wdays.count
+	 assert_equal 68, sa.get_wdays.count
  end
 
  def test_average_invoices_per_day
-	 assert_equal 9.57, sa.average_invoices_per_day
+
+	 assert_equal 9.71, sa.average_invoices_per_day
 	 assert_equal Float, sa.average_invoices_per_day.class
  end
 
  def test_gets_diff_btw_mean_and_day_freq_and_sums
-	 assert_equal 73.71, sa.diff_btw_mean_and_day_frequency_sqrd_summed
+
+	 assert_equal 69.43, sa.diff_btw_mean_and_day_frequency_sqrd_summed
 	 assert_equal Float, sa.diff_btw_mean_and_day_frequency_sqrd_summed.class
  end
 
  def test_it_gets_standard_dev_by_freq_per_day
-	 assert_equal 3.5, sa.average_frequency_per_day_standard_deviation
+
+	 assert_equal 3.4, sa.average_frequency_per_day_standard_deviation
 	 assert_equal Float, sa.average_frequency_per_day_standard_deviation.class
  end
 
  def test_it_gets_top_days_by_invoice_count
+
 	 assert_equal 2, sa.top_days_by_invoice_count.count
 	 assert_equal ["Saturday", "Thursday"], sa.top_days_by_invoice_count
 	 assert_equal Array, sa.top_days_by_invoice_count.class
 	 assert_equal String, sa.top_days_by_invoice_count.first.class
  end
+
+ def test_it_knows_total_revenue_by_date
+   assert_equal 0, sa.total_revenue_by_date(Time.parse("2004-02-14"))
+ end
+
+ def test_can_get_hash_of_merchant_invoice_totals
+   merch_inv_totals = sa.merchant_invoice_totals
+   assert_equal Hash, merch_inv_totals.class
+   assert_equal Merchant, merch_inv_totals.keys.first.class
+   assert_equal 0, merch_inv_totals.values.first
+ end
+
+ def test_it_can_rank_merchants_by_revenue
+   top_merchants = sa.top_revenue_earners(5)
+   assert_equal 5, top_merchants.count
+   assert_equal "Shopin1901", top_merchants.first.name
+ end
+
+ def test_it_can_find_merchants_with_pending_invoices
+   pending_invoices = sa.merchants_with_pending_invoices
+   assert_equal 4, pending_invoices.count
+   assert_equal Merchant, pending_invoices.last.class
+ end
+
+ def test_it_can_find_merchants_with_one_item
+   one_item_merchants = sa.merchants_with_only_one_item
+   assert_equal 1, one_item_merchants.first.items.count
+   assert_equal Merchant, one_item_merchants.first.class
+ end
+
+ def test_it_can_find_merchants_with_only_one_item_registered_in_month
+   one_item_in_month = sa.merchants_with_only_one_item_registered_in_month("January")
+   assert_equal "DesignerEstore", one_item_in_month.first.name
+   assert_equal Merchant, one_item_in_month.first.class
+ end
+
+ def test_it_can_find_revenue_by_merchant
+   assert_equal 0, merch_rev = sa.revenue_by_merchant(12334105)
+ end
+
+ def test_it_can_find_most_sold_item_for_merchants
+   most_sold = sa.most_sold_item_for_merchant(12334105)
+   assert_equal 1, most_sold.count
+   assert_equal Item, most_sold.first.class
+ end
+
+
+
 end
