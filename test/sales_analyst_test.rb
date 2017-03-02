@@ -7,13 +7,10 @@ class SalesAnalystTest < Minitest::Test
 
 	def setup
 		@se = SalesEngine.from_csv({
-  	:items     => "./test/fixtures/item_fixtures.csv",
+  	:items     => "./test/fixtures/item_fixture_sa.csv",
     :merchants => "./test/fixtures/merchant_fixtures.csv",
-    # :merchants => "./data/merchants.csv",
-    # :invoice_items => "./data/invoice_items.csv",
     :invoice_items => "./test/fixtures/invoice_item_fixture_sa.csv",
   	:transactions => "./test/fixtures/transaction_fixture.csv",
-    # :transactions => "./data/transactions.csv",
   	:invoices => "./test/fixtures/invoices_fixture.csv"
 		})
 		@sa = SalesAnalyst.new(se)
@@ -29,15 +26,15 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_that_calculates_avg_items_per_merchant
-		assert_equal 1.29, sa.average_items_per_merchant
+		assert_equal 1.41, sa.average_items_per_merchant
 	end
 
 	def test_it_calculates_diff_btw_mean_and_count_sqrd_summed
-		assert_equal 29.85, sa.diff_btw_mean_and_item_c_sqrd_summed
+		assert_equal 31.04, sa.diff_btw_mean_and_item_c_sqrd_summed
 	end
 
 	def test_avg_items_per_merchant_std_deviation
-		assert_equal 1.37, sa.average_items_per_merchant_standard_deviation
+		assert_equal 1.39, sa.average_items_per_merchant_standard_deviation
 	end
 
 	def test_high_item_count_in_merchant
@@ -75,9 +72,8 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_item_price_set
-
 		assert_equal Array, sa.get_item_price_set.class
-		assert_equal 22, sa.get_item_price_set.count
+		assert_equal 24, sa.get_item_price_set.count
 	end
 
 	def test_diff_mean_and_item_price_sqrd_summed
@@ -87,7 +83,7 @@ class SalesAnalystTest < Minitest::Test
 
 	def test_standard_deviation_avg_items
 
-		assert_equal 188.05, sa.average_item_price_standard_deviation
+		assert_equal 211.05, sa.average_item_price_standard_deviation
 	end
 
 	def test_golden_items
@@ -104,8 +100,6 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_it_can_get_whole_invoice_set
-
-		skip #this passes, slows down
 		se_one = SalesEngine.from_csv({
     :items     => "./data/items.csv",
     :merchants => "./data/merchants.csv",
@@ -133,7 +127,6 @@ class SalesAnalystTest < Minitest::Test
 	end
 
 	def test_bottom_merchants_by_invoice_count
-		#find merchant with invoices
 	 assert_equal 0, sa_two.bottom_merchants_by_invoice_count.count
  end
  def test_invoice_status_returns_percentage
@@ -143,10 +136,10 @@ class SalesAnalystTest < Minitest::Test
 	 sum = shipped + pending + returned
 	 assert_equal 29.41, pending
 	 assert_equal Float, pending.class
-	 assert_equal 13.24, returned
-	 assert_equal 57.35, shipped
+	 assert_equal 11.76, returned
+	 assert_equal 58.82, shipped
 	 assert_equal 0.0, sa.invoice_status(:hamster)
-	 assert_equal 100.00, sum
+	 assert sum > 99.99
  end
 
  def test_it_gets_wday
@@ -188,7 +181,7 @@ class SalesAnalystTest < Minitest::Test
    merch_inv_totals = sa.merchant_invoice_totals
    assert_equal Hash, merch_inv_totals.class
    assert_equal Merchant, merch_inv_totals.keys.first.class
-   assert_equal 0, merch_inv_totals.values.first
+   assert_equal BigDecimal, merch_inv_totals.values.first.class
  end
 
  def test_it_can_rank_merchants_by_revenue
@@ -199,7 +192,7 @@ class SalesAnalystTest < Minitest::Test
 
  def test_it_can_find_merchants_with_pending_invoices
    pending_invoices = sa.merchants_with_pending_invoices
-   assert_equal 4, pending_invoices.count
+   assert_equal 3, pending_invoices.count
    assert_equal Merchant, pending_invoices.last.class
  end
 
@@ -216,7 +209,7 @@ class SalesAnalystTest < Minitest::Test
  end
 
  def test_it_can_find_revenue_by_merchant
-   assert_equal 0, merch_rev = sa.revenue_by_merchant(12334105)
+   assert_equal BigDecimal, merch_rev = sa.revenue_by_merchant(12334105).class
  end
 
  def test_it_can_find_most_sold_item_for_merchants
@@ -225,6 +218,67 @@ class SalesAnalystTest < Minitest::Test
    assert_equal Item, most_sold.first.class
  end
 
+ def test_it_can_find_invoice_items
+   paid_invoices = sa.find_invoice_items(se.merchants.find_by_id(12334105).invoices)
+   assert_equal 6, paid_invoices.count
+   assert_equal InvoiceItem, paid_invoices.first.class
+   assert_equal 344, paid_invoices.first.id
+ end
+
+ def test_it_can_add_quantity_of_invoice_item
+   sold_count = Hash.new(0)
+   paid_invoices = sa.find_invoice_items(se.merchants.find_by_id(12334105).invoices)
+   quantity_hash = sa.add_quantity_of_invoice_item(paid_invoices, sold_count)
+   assert_equal Hash, quantity_hash.class
+   assert_equal Array, quantity_hash.first.class
+ end
+
+ def test_it_can_find_high_item_ids
+   sold_count = Hash.new(0)
+   paid_invoices = sa.find_invoice_items(se.merchants.find_by_id(12334105).invoices)
+   hash = sa.add_quantity_of_invoice_item(paid_invoices, sold_count)
+   result = sa.find_high_item_ids(hash)
+   assert_equal Hash, result.class
+   assert_equal 10, result.values.first
+ end
+
+ def test_it_can_find_highest_items_by_id
+   sold_count = Hash.new(0)
+   paid_invoices = sa.find_invoice_items(se.merchants.find_by_id(12334105).invoices)
+   hash = sa.add_quantity_of_invoice_item(paid_invoices, sold_count)
+   expected = sa.find_high_item_ids(hash)
+   result = sa.find_highest_items_by_id(expected)
+   assert_equal Array, result.class
+   assert_equal Item, result.first.class
+   assert_equal 263543136, result.first.id
+ end
+
+ def test_it_can_find_invoices_for_merchant
+   found = sa.find_invoices_for_merchant(12334105)
+   assert_equal Array, found.class
+   assert_equal Invoice, found.first.class
+ end
+
+ def test_it_can_find_paid_in_full_invoice_items_for_merchant
+    found_inv = sa.find_invoices_for_merchant(12334105)
+    result = sa.find_invoice_items_for_merchant(found_inv)
+    assert_equal Array, result.class
+    assert_equal InvoiceItem, result.first.class
+ end
+
+ def test_we_can_populate_price_hash
+   found_inv = sa.find_invoices_for_merchant(12334105)
+   inv_items = sa.find_invoice_items_for_merchant(found_inv)
+   expected = sa.add_price_of_invoice_item(inv_items)
+   assert_equal Hash, expected.class
+   assert_equal BigDecimal, expected.values.first.class
+ end
+
+ def test_it_can_get_best_item_for_merchant
+   expected = sa.best_item_for_merchant(12334105)
+   assert_equal Item, expected.class
+   assert_equal 263500126, expected.id
+ end
 
 
 end

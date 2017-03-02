@@ -2,7 +2,7 @@ require_relative 'test_helper'
 require './lib/sales_engine'
 require './lib/transaction_repository'
 
-class TransactionRepositoryTest < Minitest::Test 
+class TransactionRepositoryTest < Minitest::Test
 	attr_reader :se, :trans_repo
 	def setup
 		@se = SalesEngine.from_csv({
@@ -20,11 +20,11 @@ class TransactionRepositoryTest < Minitest::Test
 	end
 
 	def test_all_method_returns_array_of_all_invoices
-		assert_equal 524, trans_repo.all.count
+		assert_equal 525, trans_repo.all.count
 		assert_equal Array, trans_repo.all.class
 	end
 
-	def test_find_by_id	
+	def test_find_by_id
 		assert_equal Transaction, trans_repo.find_by_id(12).class
 		assert_nil trans_repo.find_by_id('horse')
 	end

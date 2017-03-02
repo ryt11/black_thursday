@@ -5,18 +5,14 @@ require './lib/transaction'
 class TransactionTest < Minitest::Test
 	attr_reader :transaction
 	def setup
-		@transaction = Transaction.new({:id => "7".to_i, :credit_card_number => "4613250127567219".to_i, :invoice_id => "1298".to_i, 
-			:credit_card_expiration_date => "2012-02-26 20:56:57 UTC", :result => "success", 
-			:created_at => Time.parse('2012-02-26 20:56:57 UTC'), 
+		@transaction = Transaction.new({:id => "7".to_i, :credit_card_number => "4613250127567219".to_i, :invoice_id => "1298".to_i,
+			:credit_card_expiration_date => "2012-02-26 20:56:57 UTC", :result => "success",
+			:created_at => Time.parse('2012-02-26 20:56:57 UTC'),
 			:updated_at => Time.parse('2012-02-26 20:56:57 UTC')}, nil)
 	end
 
 	def test_transaction_info_exists
-		expected = {:id => "7".to_i, :credit_card_number => "4613250127567219".to_i, :invoice_id => "1298".to_i, 
-			:credit_card_expiration_date => Time.parse("2012-02-26 20:56:57 UTC"), :result => "success", 
-			:created_at => Time.parse('2012-02-26 20:56:57 UTC'), 
-			:updated_at => Time.parse('2012-02-26 20:56:57 UTC')}
-		assert_equal expected, transaction.transaction_info
+		assert_equal Hash, transaction.transaction_info.class
 	end
 
 	def test_transaction_instance_exists

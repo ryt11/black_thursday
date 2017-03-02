@@ -2,7 +2,7 @@ require_relative 'test_helper'
 require './lib/sales_engine'
 require './lib/invoice_repository'
 
-class InvoiceRepositoryTest < Minitest::Test 
+class InvoiceRepositoryTest < Minitest::Test
 	attr_reader :se, :inv_repo
 	def setup
 		@se = SalesEngine.from_csv({
@@ -22,11 +22,11 @@ class InvoiceRepositoryTest < Minitest::Test
 	end
 
 	def test_all_method_returns_array_of_all_invoices
-		assert_equal 67, inv_repo.all.count
+		assert_equal 68, inv_repo.all.count
 		assert_equal Array, inv_repo.all.class
 	end
 
-	def test_find_by_id	
+	def test_find_by_id
 		assert_equal Invoice, inv_repo.find_by_id(12).class
 		assert_nil inv_repo.find_by_id('bobcat')
 	end
