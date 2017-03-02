@@ -7,7 +7,7 @@ require 'time'
 class CustomerRepository
   attr_reader :file, :customers, :se_inst
   def initialize(file, se_inst)
-    @file = file
+    @file = file 
     @se_inst = se_inst
     @customers = Hash.new(0)
     customer_maker

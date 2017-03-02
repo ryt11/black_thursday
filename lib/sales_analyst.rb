@@ -239,7 +239,8 @@
     sold_count = Hash.new(0)
     invoices = se_inst.merchants.find_by_id(merchant_id).invoices
     find_invoice_items(invoices)
-    add_quantity_of_invoice_item(find_invoice_items(invoices), sold_count)
+    ph = add_quantity_of_invoice_item(find_invoice_items(invoices), sold_count)
+    find_highest_items_by_id(find_high_item_ids(ph))
   end
 
     def find_invoice_items(invoices)
@@ -256,8 +257,7 @@
     invoice_items.each do |item|
       sold_count[item.item_id] += item.quantity
     end
-    high_item_ids = find_high_item_ids(sold_count)
-    find_highest_items_by_id(high_item_ids)
+    sold_count
   end
 
   def find_high_item_ids(sold_count)
@@ -272,24 +272,34 @@
     end
   end
 
-  def best_item_for_merchant(merchant_id)
+  def find_invoices_for_merchant(merchant_id)
+    se_inst.merchants.find_by_id(merchant_id).invoices
+  end
+
+  def find_invoice_items_for_merchant (invoices)
+    se = se_inst.invoice_items
+    invoices.map do |inv|
+        inv.is_paid_in_full? ? se.find_all_by_invoice_id(inv.id) : next
+    end.flatten(1).compact
+  end
+
+  def add_price_of_invoice_item(inv_items)
     revenue_count = Hash.new(0)
-    invoices = se_inst.merchants.find_by_id(merchant_id).invoices
-    invoice_items = invoices.map do |invoice|
-      if invoice.is_paid_in_full?
-        se_inst.invoice_items.find_all_by_invoice_id(invoice.id)
-        else
-          next
-        end
-      end.flatten(1).compact
-      #make new method
-    invoice_items.each do |item|
+    inv_items.each do |item|
       revenue_count[item.item_id] += (item.quantity * item.unit_price)
     end
-    #method
+    revenue_count
+  end
+
+  def best_item_for_merchant(merchant_id)
+    invoices = find_invoices_for_merchant(merchant_id)
+    inv_items = find_invoice_items_for_merchant(invoices)
+    revenue_count = add_price_of_invoice_item(inv_items)
     high_revenue_items = revenue_count.select do |k, v|
       k if v == revenue_count.values.max
     end
     se_inst.items.find_by_id(high_revenue_items.keys[0])
+
   end
+
 end

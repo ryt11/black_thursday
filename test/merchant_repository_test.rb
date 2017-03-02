@@ -2,7 +2,7 @@ require_relative 'test_helper'
 require './lib/sales_engine'
 require './lib/merchant_repository'
 
-class MerchantRepositoryTest < Minitest::Test 
+class MerchantRepositoryTest < Minitest::Test
 	attr_reader :se, :mr
 	def setup
 		@se = SalesEngine.from_csv({
@@ -32,10 +32,8 @@ class MerchantRepositoryTest < Minitest::Test
 	end
 
 	def test_it_can_find_all_by_name
-		expected = ["SHOPIN1901", "THEPURPLEPENSHOP", "WOODENPENSHOP", "ZAZABOUTIQUESHOP", "SOUDOVESHOP", "WOODLEYSHOP", "EXECUTIVEGIFTSHOPPE", "CHALKLEYSWOODSHOP", "FRENCHIEZSHOP", "SIMCHACENTRALSHOP", "SHOPDIXIECHICKEN", "BEBRAVESHOP", "SHOP20161", "SHOPTIMECREATIONS", "MAKOSMOMSBLANKETSHOP", "MANDYBLACKSHOP", "RETROPOSTERSHOP", "SHOPATPINKFLAMINGO", "SHOPAMO", "KAWAIIANSHOP", "BISHOPSWOODCRAFT", "FUNTIMEWORKSHOP", "MATTSNERDSHOPPE", "SHOPKARISSA", "KAMLANDSOAPSHOP", "RANAPARVASHOP"]
-
-		result = mr.find_all_by_name('shop')
+		result = mr.find_all_by_name('shopin')
 		assert_equal Array, result.class
-		assert_equal expected, result 
+		assert_equal 1, result.count
 	end
 end
