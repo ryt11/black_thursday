@@ -48,16 +48,6 @@ class InvoiceItemRepository
 
   end
 
-
-  # def find_all_by_name(fragment)
-  #   found_invoice_items = @invoice_items.values.map do |invoice_item|
-  #     if invoice_item.name.downcase.include?(fragment.downcase)
-  #       invoice_item
-  #     end
-  #   end
-  #   found_invoice_items.compact
-  # end
-
   def inspect
     "#<#{self.class} #{@invoice_items.size} rows>"
   end
