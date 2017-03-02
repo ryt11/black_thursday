@@ -12,7 +12,9 @@
 
   def diff_btw_mean_and_item_c_sqrd_summed
     mean = average_items_per_merchant
-    get_merchant_items_set.map { |item_c| (item_c - mean) ** 2 }.reduce(:+).round(2)
+    get_merchant_items_set.map do |item_c|
+       (item_c - mean) ** 2
+    end.reduce(:+).round(2)
   end
 
   def get_merchant_items_set
